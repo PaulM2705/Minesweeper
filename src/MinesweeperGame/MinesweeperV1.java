@@ -65,16 +65,16 @@ public class MinesweeperV1 extends JFrame {
         buttons[row][col].setEnabled(false);
         
         if (mines[row][col]) {
-            // Game over
+
             JOptionPane.showMessageDialog(this, "Game Over! You hit a mine!");
             revealAllMines();
         } else {
-            // Count adjacent mines
+
             int count = countAdjacentMines(row, col);
             if (count > 0) {
                 buttons[row][col].setText(Integer.toString(count));
             } else {
-                // Reveal adjacent cells recursively
+            	
                 for (int i = Math.max(0, row - 1); i <= Math.min(ROWS - 1, row + 1); i++) {
                     for (int j = Math.max(0, col - 1); j <= Math.min(COLS - 1, col + 1); j++) {
                         if (!(i == row && j == col)) {
