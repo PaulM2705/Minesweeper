@@ -102,7 +102,7 @@ public class MinesweeperV1 extends JFrame {
         for (int i = 0; i < ROWS; i++) {
             for (int j = 0; j < COLS; j++) {
                 if (mines[i][j]) {
-                    buttons[i][j].setText("*");
+                    buttons[i][j].setText("💣");
                 }
             }
         }
