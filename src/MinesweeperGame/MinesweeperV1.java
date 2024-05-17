@@ -4,8 +4,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class MinesweeperV1 extends JFrame {
-    private final int ROWS = 10;
+public class MinesweeperV1 extends JFrame {//Test99
+	
+    private final int ROWS = 10;//Test1000
     private final int COLS = 10;
     private final int NUM_MINES = 10;
 
