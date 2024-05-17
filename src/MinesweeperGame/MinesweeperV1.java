@@ -17,7 +17,7 @@ public class MinesweeperV1 extends JFrame {
         setTitle("Minesweeper");
         setSize(400, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new GridLayout(ROWS, COLS));
+        setLayout(new GridLayout(ROWS, COLS)); //Test
         
         buttons = new JButton[ROWS][COLS];
         mines = new boolean[ROWS][COLS];
