@@ -12,13 +12,11 @@ public class MinesweeperMain {
     private static final int SIZE = 500;
     private static final double POPULATION_CONSTANT = 1.5;
 
-    private static final String HIGHSCORE_FILE = "highscore.txt";
-
     private static Cell[] reusableStorage = new Cell[8];
 
     private int gridSize;
     private int score;
-    private int highscore;
+    private int highscore = 0;
 
     private Cell[][] cells;
 
@@ -26,11 +24,14 @@ public class MinesweeperMain {
     private JButton reset;
     private JButton giveUp;
     private JLabel scoreLabel;
+    private JLabel highscoreLabel;
 
     private final ActionListener actionListener = actionEvent -> {
         Object source = actionEvent.getSource();
         if (source == reset) {
+            score = 0;
             createMines();
+            updateScoreLabel();
         } else if (source == giveUp) {
             revealBoardAndDisplay("You gave up.");
         } else {
@@ -136,7 +137,6 @@ public class MinesweeperMain {
         initializeGrid();
         initializeScore();
         initializeScoreLabel();
-        loadHighscore();
 
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -145,17 +145,25 @@ public class MinesweeperMain {
 
 
     private void initializeScoreLabel() {
-        scoreLabel = new JLabel("Score: " + score + "   Highscore: " + highscore);
-        frame.add(scoreLabel, BorderLayout.NORTH);
+        scoreLabel = new JLabel("Score: " + score);
+        highscoreLabel = new JLabel("Highscore: " + highscore);
+
+        JPanel scorePanel = new JPanel(new BorderLayout());
+
+        scorePanel.add(scoreLabel, BorderLayout.WEST);
+        scorePanel.add(highscoreLabel, BorderLayout.EAST);
+
+        frame.add(scorePanel, BorderLayout.NORTH);
     }
 
     private void initializeScore() {
         score = 0;
-        highscore = 0;
+        //highscore = 0;
     }
 
     private void updateScoreLabel() {
-        scoreLabel.setText("Score: " + score + "   Highscore: " + highscore);
+        scoreLabel.setText("Score: " + score);
+        highscoreLabel.setText("Highscore: " + highscore);
     }
 
     private void updateScore(Cell cell) {
@@ -253,23 +261,9 @@ public class MinesweeperMain {
                 positions.add(cell);
                 cascade(positions);
             }
-        }checkForWin();
-    }
-
-    private void loadHighscore() {
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader("C:/Users/piet_/IdeaProjects/SpielProg2/src/highscore.txt"));
-            String line = reader.readLine();
-            if (line != null && !line.isEmpty()) {
-                highscore = Integer.parseInt(line);
-            }
-            reader.close();
-        } catch (IOException | NumberFormatException e) {
-            // Fehler beim Laden des Highscores
-            e.printStackTrace();
         }
+        checkForWin();
     }
-
 
     private void revealBoardAndDisplay(String message) {
         for (int row = 0; row < gridSize; row++) {
@@ -329,20 +323,10 @@ public class MinesweeperMain {
             );
             if (score > highscore) {
                 highscore = score;
-                saveHighscore();
+                updateScoreLabel();
             }
         }
     }
-    private void saveHighscore() {
-        try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(HIGHSCORE_FILE));
-            writer.write(String.valueOf(highscore));
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace(); // Fehlerbehandlung für das Schreiben des Highscores
-        }
-    }
-
 
     private static void run(final int gridSize) {
         try {
