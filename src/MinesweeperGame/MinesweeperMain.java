@@ -1,22 +1,19 @@
-package MinesweeperGame;
-
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.*;
 import java.util.*;
 
 public class MinesweeperMain {
 
     private static final int MINE = 10;
     private static final int SIZE = 500;
-    private static final double POPULATION_CONSTANT = 1.5;
 
     private static Cell[] reusableStorage = new Cell[8];
 
-    private int gridSize;
+    private int gridSize = 10; //legt die Größe des Feldes fest
     private int score;
-    private int highscore = 0;
+    private int highscore = 0; // Highscore wird hier gespeichert
 
     private Cell[][] cells;
 
@@ -34,6 +31,8 @@ public class MinesweeperMain {
             updateScoreLabel();
         } else if (source == giveUp) {
             revealBoardAndDisplay("You gave up.");
+            score = 0;
+            updateScoreLabel();
         } else {
             handleCell((Cell) source);
         }
@@ -88,9 +87,7 @@ public class MinesweeperMain {
 
         void getNeighbours(final Cell[] container) {
             // Alle Elemente null setzen
-            for (int i = 0; i < reusableStorage.length; i++) {
-                reusableStorage[i] = null;
-            }
+            Arrays.fill(container, null);
 
             int index = 0;
 
@@ -125,7 +122,7 @@ public class MinesweeperMain {
         }
     }
 
-    private MinesweeperMain(final int gridSize) {
+    private MinesweeperMain() {
         this.gridSize = gridSize;
         cells = new Cell[gridSize][gridSize];
 
@@ -143,7 +140,6 @@ public class MinesweeperMain {
         frame.setVisible(true);
     }
 
-
     private void initializeScoreLabel() {
         scoreLabel = new JLabel("Score: " + score);
         highscoreLabel = new JLabel("Highscore: " + highscore);
@@ -158,7 +154,6 @@ public class MinesweeperMain {
 
     private void initializeScore() {
         score = 0;
-        //highscore = 0;
     }
 
     private void updateScoreLabel() {
@@ -190,6 +185,10 @@ public class MinesweeperMain {
     }
 
     private void initializeGrid() {
+        if (gridSize <= 0) {
+            throw new IllegalArgumentException("Grid size must be greater than 0");
+        }
+
         Container grid = new Container();
         grid.setLayout(new GridLayout(gridSize, gridSize));
 
@@ -199,8 +198,8 @@ public class MinesweeperMain {
                 grid.add(cells[row][col]);
             }
         }
-        createMines();
         frame.add(grid, BorderLayout.CENTER);
+        createMines();
     }
 
     private void resetAllCells() {
@@ -214,27 +213,22 @@ public class MinesweeperMain {
     private void createMines() {
         resetAllCells();
 
-        final int mineCount = (int) POPULATION_CONSTANT * gridSize;
+        final int mineCount = (gridSize * gridSize / 10);
         final Random random = new Random();
 
-        // Map all (row, col) pairs to unique integers
-        Set<Integer> positions = new HashSet<>(gridSize * gridSize);
-        for (int row = 0; row < gridSize; row++) {
-            for (int col = 0; col < gridSize; col++) {
-                positions.add(row * gridSize + col);
-            }
+        Set<Integer> minePositions = new HashSet<>();
+        while (minePositions.size() < mineCount) {
+            int pos = random.nextInt(gridSize * gridSize);
+            minePositions.add(pos);
         }
 
-        // Mienen Initialisieren
-        for (int index = 0; index < mineCount; index++) {
-            int choice = random.nextInt(positions.size());
-            int row = choice / gridSize;
-            int col = choice % gridSize;
+        for (int pos : minePositions) {
+            int row = pos / gridSize;
+            int col = pos % gridSize;
             cells[row][col].setValue(MINE);
-            positions.remove(choice);
         }
 
-        //  Anzahl Nachbarn Initialisieren
+        // Anzahl Nachbarn Initialisieren
         for (int row = 0; row < gridSize; row++) {
             for (int col = 0; col < gridSize; col++) {
                 if (!cells[row][col].isAMine()) {
@@ -252,7 +246,12 @@ public class MinesweeperMain {
             cell.setForeground(Color.RED);
             cell.reveal();
             updateScore(cell);
-            revealBoardAndDisplay("You clicked on a mine.");
+            JOptionPane.showMessageDialog(
+                    frame, "You clicked on a mine.", "Game Over",
+                    JOptionPane.ERROR_MESSAGE
+            );
+            resetAllCells(); // Reset cells
+            createMines();
         } else {
             cell.reveal();
             updateScore(cell);
@@ -262,8 +261,9 @@ public class MinesweeperMain {
                 cascade(positions);
             }
         }
-        checkForWin();
+        checkForWinOrLoss();
     }
+
 
     private void revealBoardAndDisplay(String message) {
         for (int row = 0; row < gridSize; row++) {
@@ -280,6 +280,7 @@ public class MinesweeperMain {
         );
 
         createMines();
+        checkForWinOrLoss();
     }
 
     private void cascade(Set<Cell> positionsToClear) {
@@ -304,7 +305,7 @@ public class MinesweeperMain {
         }
     }
 
-    private void checkForWin() {
+    private void checkForWinOrLoss() {
         boolean won = true;
         outer:
         for (Cell[] cellRow : cells) {
@@ -321,23 +322,80 @@ public class MinesweeperMain {
                     frame, "You have won!", "Congratulations",
                     JOptionPane.INFORMATION_MESSAGE
             );
-            if (score > highscore) {
-                highscore = score;
-                updateScoreLabel();
-            }
         }
-    }
 
-    private static void run(final int gridSize) {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception ignore) {
+        if (score > highscore) {
+            highscore = score;
+            updateScoreLabel();
         }
-        new MinesweeperMain(gridSize);
     }
 
     public static void main(String[] args) {
-        final int gridSize = 10;
-        SwingUtilities.invokeLater(() -> MinesweeperMain.run(gridSize));
+        SwingUtilities.invokeLater(() -> {
+            // Starte das Spiel
+            new MinesweeperMain().start();
+        });
+    }
+
+    // Methode zum Starten des Spiels und Anzeigen des Startmenüs
+    private void start() {
+        JFrame menuFrame = new JFrame("Minesweeper Start Menu");
+        menuFrame.setSize(SIZE, SIZE);
+        menuFrame.setLayout(new BorderLayout());
+
+        // Erstelle das Startmenü-Panel
+        JPanel startMenuPanel = new JPanel();
+        startMenuPanel.setLayout(new BorderLayout());
+
+        // Willkommensnachricht
+        JLabel welcomeLabel = new JLabel("Willkommen bei Minesweeper von Piet Grube und Paul Mahrt");
+        welcomeLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        startMenuPanel.add(welcomeLabel, BorderLayout.NORTH);
+
+        // Buttons für die Levelauswahl
+        JPanel levelButtonPanel = new JPanel();
+        levelButtonPanel.setLayout(new GridLayout(3, 1));
+
+        JButton level1Button = new JButton("Level 1");
+        JButton level2Button = new JButton("Level 2");
+        JButton level3Button = new JButton("Level 3");
+
+        // ActionListener für die Levelauswahl
+        ActionListener levelActionListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Bestimme das gewählte Level
+                int gridSize = 0;
+                if (e.getSource() == level1Button) {
+                    gridSize = 5; // Beispiel: Level 1 hat eine Gittergröße von 5x5
+                } else if (e.getSource() == level2Button) {
+                    gridSize = 8; // Beispiel: Level 2 hat eine Gittergröße von 8x8
+                } else if (e.getSource() == level3Button) {
+                    gridSize = 10; // Beispiel: Level 3 hat eine Gittergröße von 10x10
+                }
+
+                // Starte das Spiel mit dem gewählten Level
+                menuFrame.dispose(); // Schließe das Startmenü
+                new MinesweeperMain(); // Starte das Spiel mit dem gewählten Level
+            }
+        };
+
+
+        level1Button.addActionListener(levelActionListener);
+        level2Button.addActionListener(levelActionListener);
+        level3Button.addActionListener(levelActionListener);
+
+        levelButtonPanel.add(level1Button);
+        levelButtonPanel.add(level2Button);
+        levelButtonPanel.add(level3Button);
+
+        startMenuPanel.add(levelButtonPanel, BorderLayout.CENTER);
+
+
+        menuFrame.add(startMenuPanel, BorderLayout.CENTER);
+
+        menuFrame.setLocationRelativeTo(null);
+        menuFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        menuFrame.setVisible(true);
     }
 }
