@@ -1,3 +1,5 @@
+package MinesweeperGame;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -122,7 +124,7 @@ public class MinesweeperMain {
         }
     }
 
-    private MinesweeperMain() {
+    private MinesweeperMain(int gridSize) {
         this.gridSize = gridSize;
         cells = new Cell[gridSize][gridSize];
 
@@ -140,7 +142,10 @@ public class MinesweeperMain {
         frame.setVisible(true);
     }
 
-    private void initializeScoreLabel() {
+    public MinesweeperMain() {
+	// TODO Auto-generated constructor stub
+}
+private void initializeScoreLabel() {
         scoreLabel = new JLabel("Score: " + score);
         highscoreLabel = new JLabel("Highscore: " + highscore);
 
@@ -330,15 +335,15 @@ public class MinesweeperMain {
         }
     }
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             // Starte das Spiel
             new MinesweeperMain().start();
         });
-    }
+    }*/
 
     // Methode zum Starten des Spiels und Anzeigen des Startmenüs
-    private void start() {
+    void start() {
         JFrame menuFrame = new JFrame("Minesweeper Start Menu");
         menuFrame.setSize(SIZE, SIZE);
         menuFrame.setLayout(new BorderLayout());
@@ -376,7 +381,7 @@ public class MinesweeperMain {
 
                 // Starte das Spiel mit dem gewählten Level
                 menuFrame.dispose(); // Schließe das Startmenü
-                new MinesweeperMain(); // Starte das Spiel mit dem gewählten Level
+                new MinesweeperMain(gridSize); // Starte das Spiel mit dem gewählten Level
             }
         };
 
@@ -398,4 +403,8 @@ public class MinesweeperMain {
         menuFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         menuFrame.setVisible(true);
     }
-}
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            new MinesweeperMain().start();
+        });
+    }}
