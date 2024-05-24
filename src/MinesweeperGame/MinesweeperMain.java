@@ -143,9 +143,10 @@ public class MinesweeperMain {
     }
 
     public MinesweeperMain() {
-	// TODO Auto-generated constructor stub
-}
-private void initializeScoreLabel() {
+        // TODO Auto-generated constructor stub
+    }
+
+    private void initializeScoreLabel() {
         scoreLabel = new JLabel("Score: " + score);
         highscoreLabel = new JLabel("Highscore: " + highscore);
 
@@ -218,7 +219,7 @@ private void initializeScoreLabel() {
     private void createMines() {
         resetAllCells();
 
-        final int mineCount = (gridSize * gridSize / 10);
+        final int mineCount = gridSize;
         final Random random = new Random();
 
         Set<Integer> minePositions = new HashSet<>();
@@ -226,7 +227,6 @@ private void initializeScoreLabel() {
             int pos = random.nextInt(gridSize * gridSize);
             minePositions.add(pos);
         }
-
         for (int pos : minePositions) {
             int row = pos / gridSize;
             int col = pos % gridSize;
@@ -269,7 +269,6 @@ private void initializeScoreLabel() {
         checkForWinOrLoss();
     }
 
-
     private void revealBoardAndDisplay(String message) {
         for (int row = 0; row < gridSize; row++) {
             for (int col = 0; col < gridSize; col++) {
@@ -278,12 +277,10 @@ private void initializeScoreLabel() {
                 }
             }
         }
-
         JOptionPane.showMessageDialog(
                 frame, message, "Game Over",
                 JOptionPane.ERROR_MESSAGE
         );
-
         createMines();
         checkForWinOrLoss();
     }
@@ -321,26 +318,17 @@ private void initializeScoreLabel() {
                 }
             }
         }
-
         if (won) {
             JOptionPane.showMessageDialog(
                     frame, "You have won!", "Congratulations",
                     JOptionPane.INFORMATION_MESSAGE
             );
         }
-
         if (score > highscore) {
             highscore = score;
             updateScoreLabel();
         }
     }
-
-    /*public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            // Starte das Spiel
-            new MinesweeperMain().start();
-        });
-    }*/
 
     // Methode zum Starten des Spiels und Anzeigen des Startmenüs
     void start() {
@@ -365,26 +353,25 @@ private void initializeScoreLabel() {
         JButton level2Button = new JButton("Level 2");
         JButton level3Button = new JButton("Level 3");
 
-        // ActionListener für die Levelauswahl
+        //Levelauswahl
         ActionListener levelActionListener = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Bestimme das gewählte Level
+
                 int gridSize = 0;
                 if (e.getSource() == level1Button) {
-                    gridSize = 5; // Beispiel: Level 1 hat eine Gittergröße von 5x5
+                    gridSize = 5;
                 } else if (e.getSource() == level2Button) {
-                    gridSize = 8; // Beispiel: Level 2 hat eine Gittergröße von 8x8
+                    gridSize = 10;
                 } else if (e.getSource() == level3Button) {
-                    gridSize = 10; // Beispiel: Level 3 hat eine Gittergröße von 10x10
+                    gridSize = 15;
                 }
 
                 // Starte das Spiel mit dem gewählten Level
-                menuFrame.dispose(); // Schließe das Startmenü
-                new MinesweeperMain(gridSize); // Starte das Spiel mit dem gewählten Level
+                menuFrame.dispose(); // Schließe Startmenü
+                new MinesweeperMain(gridSize); // Startet Spiel mit gewählten Level
             }
         };
-
 
         level1Button.addActionListener(levelActionListener);
         level2Button.addActionListener(levelActionListener);
@@ -396,15 +383,16 @@ private void initializeScoreLabel() {
 
         startMenuPanel.add(levelButtonPanel, BorderLayout.CENTER);
 
-
         menuFrame.add(startMenuPanel, BorderLayout.CENTER);
 
         menuFrame.setLocationRelativeTo(null);
         menuFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         menuFrame.setVisible(true);
     }
+
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             new MinesweeperMain().start();
         });
-    }}
+    }
+}
