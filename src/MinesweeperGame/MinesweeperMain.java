@@ -4,12 +4,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.*;
 
 public class MinesweeperMain {
@@ -21,7 +17,7 @@ public class MinesweeperMain {
 
     private int gridSize = 10; //legt die Größe des Feldes fest
     private int score;
-    private String highscore = ""; // Highscore wird hier gespeichert
+    private int highscore = 0; // Highscore wird hier gespeichert
 
     private Cell[][] cells;
 
@@ -46,15 +42,26 @@ public class MinesweeperMain {
         }
     };
 
+    private final MouseAdapter mouseAdapter = new MouseAdapter() {
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            if (SwingUtilities.isRightMouseButton(e)) {
+                handleRightClick((Cell) e.getSource());
+            }
+        }
+    };
+
     private class Cell extends JButton {
         private final int row;
         private final int col;
         private int value;
+        private boolean flagged;
 
         Cell(final int row, final int col, final ActionListener actionListener) {
             this.row = row;
             this.col = col;
             addActionListener(actionListener);
+            addMouseListener(mouseAdapter);
             setText("");
         }
 
@@ -74,11 +81,14 @@ public class MinesweeperMain {
             setValue(0);
             setEnabled(true);
             setText("");
+            setFlagged(false);
         }
 
         void reveal() {
-            setEnabled(false);
-            setText(isAMine() ? "\uD83D\uDCA3\u200B" : String.valueOf(value));
+            if (!flagged) {
+                setEnabled(false);
+                setText(isAMine() ? "\uD83D\uDCA3\u200B" : String.valueOf(value));
+            }
         }
 
         void updateNeighbourCount() {
@@ -116,6 +126,15 @@ public class MinesweeperMain {
             }
         }
 
+        boolean isFlagged() {
+            return flagged;
+        }
+
+        void setFlagged(boolean flagged) {
+            this.flagged = flagged;
+            setText(flagged ? "\uD83D\uDEA9" : "");
+        }
+
         @Override
         public boolean equals(Object obj) {
             if (this == obj) return true;
@@ -138,10 +157,13 @@ public class MinesweeperMain {
         frame.setSize(SIZE, SIZE);
         frame.setLayout(new BorderLayout());
 
+        JPanel gridPanel = new JPanel(new GridBagLayout());
+        frame.add(gridPanel, BorderLayout.CENTER);
+
         initializeButtonPanel();
-        initializeGrid();
-        initializeScoreLabel();
+        initializeGrid(gridPanel);
         initializeScore();
+        initializeScoreLabel();
 
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -149,9 +171,10 @@ public class MinesweeperMain {
     }
 
     public MinesweeperMain() {
-	// TODO Auto-generated constructor stub
-}
-private void initializeScoreLabel() {
+        // TODO Auto-generated constructor stub
+    }
+
+    private void initializeScoreLabel() {
         scoreLabel = new JLabel("Score: " + score);
         highscoreLabel = new JLabel("Highscore: " + highscore);
 
@@ -165,8 +188,6 @@ private void initializeScoreLabel() {
 
     private void initializeScore() {
         score = 0;
-        highscore = GetHighScore();
-        updateScoreLabel();
     }
 
     private void updateScoreLabel() {
@@ -181,7 +202,6 @@ private void initializeScoreLabel() {
             score += cell.getValue();
         }
         updateScoreLabel();
-        System.out.println("Current score: " + score);
     }
 
     private void initializeButtonPanel() {
@@ -198,21 +218,26 @@ private void initializeScoreLabel() {
         frame.add(buttonPanel, BorderLayout.SOUTH);
     }
 
-    private void initializeGrid() {
+    private void initializeGrid(JPanel gridPanel) {
         if (gridSize <= 0) {
             throw new IllegalArgumentException("Grid size must be greater than 0");
         }
 
-        Container grid = new Container();
-        grid.setLayout(new GridLayout(gridSize, gridSize));
+        gridPanel.setLayout(new GridLayout(gridSize, gridSize));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1 / gridSize;
+        gbc.weighty = 1 / gridSize;
 
         for (int row = 0; row < gridSize; row++) {
             for (int col = 0; col < gridSize; col++) {
                 cells[row][col] = new Cell(row, col, actionListener);
-                grid.add(cells[row][col]);
+                gbc.gridx = col;
+                gbc.gridy = row;
+                gridPanel.add(cells[row][col], gbc);
             }
         }
-        frame.add(grid, BorderLayout.CENTER);
         createMines();
     }
 
@@ -227,7 +252,7 @@ private void initializeScoreLabel() {
     private void createMines() {
         resetAllCells();
 
-        final int mineCount = (gridSize * gridSize / 10);
+        final int mineCount = gridSize * gridSize / 30;
         final Random random = new Random();
 
         Set<Integer> minePositions = new HashSet<>();
@@ -235,7 +260,6 @@ private void initializeScoreLabel() {
             int pos = random.nextInt(gridSize * gridSize);
             minePositions.add(pos);
         }
-
         for (int pos : minePositions) {
             int row = pos / gridSize;
             int col = pos % gridSize;
@@ -264,7 +288,6 @@ private void initializeScoreLabel() {
                     frame, "You clicked on a mine.", "Game Over",
                     JOptionPane.ERROR_MESSAGE
             );
-            CheckScore();
             resetAllCells(); // Reset cells
             createMines();
         } else {
@@ -279,7 +302,6 @@ private void initializeScoreLabel() {
         checkForWinOrLoss();
     }
 
-
     private void revealBoardAndDisplay(String message) {
         for (int row = 0; row < gridSize; row++) {
             for (int col = 0; col < gridSize; col++) {
@@ -288,12 +310,10 @@ private void initializeScoreLabel() {
                 }
             }
         }
-
         JOptionPane.showMessageDialog(
                 frame, message, "Game Over",
                 JOptionPane.ERROR_MESSAGE
         );
-        CheckScore();
         createMines();
         checkForWinOrLoss();
     }
@@ -331,113 +351,24 @@ private void initializeScoreLabel() {
                 }
             }
         }
-
         if (won) {
             JOptionPane.showMessageDialog(
                     frame, "You have won!", "Congratulations",
                     JOptionPane.INFORMATION_MESSAGE
             );
-            CheckScore(); 
         }
-
-        if (highscore.equals("")) {
-        	
-        	highscore = this.GetHighScore();
+        if (score > highscore) {
+            highscore = score;
+            updateScoreLabel();
         }
-    }
-    
-    public String GetHighScore() {
-    	File scoreFile = new File("highscore.dat");
-        if (!scoreFile.exists()) {
-            try {
-                scoreFile.createNewFile();
-                FileWriter writeFile = new FileWriter(scoreFile);
-                BufferedWriter writer = new BufferedWriter(writeFile);
-                writer.write("0");
-                writer.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return "0";
-        }
-        
-    	FileReader readFile = null;
-    	BufferedReader reader = null;
-    	
-    	try 
-    	{
-    		readFile = new FileReader(scoreFile);
-    		reader = new BufferedReader(readFile);
-    		String highscore = reader.readLine();
-    		System.out.println("Loaded highscore: " + highscore);
-    		return highscore != null ? highscore : "0";
-    	}
-    	
-    	catch (Exception e) 
-    	{
-    		System.out.println("Error loading highscore: " + e.getMessage());
-    		return "0";
-    	}
-    	finally 
-    	{
-    		try {
-    			if (reader !=null)reader.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-    	}
-    }
-    
-    public void CheckScore() {
-    	
-    	if (score > Integer.parseInt(highscore)) 
-    	{
-    		highscore = String.valueOf(score);
-    		JOptionPane.showMessageDialog(null, "Neuer Highscore: " + highscore, "Highscore", JOptionPane.INFORMATION_MESSAGE);
-    		
-    		File scoreFile = new File("highscore.dat");
-    		if (!scoreFile.exists()) {
-    			try {
-					scoreFile.createNewFile();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-    			
-    		}
-    		FileWriter writeFile = null;
-    		BufferedWriter writer = null;
-    		
-    		try 
-    		{
-    			writeFile = new FileWriter(scoreFile);
-    			writer = new BufferedWriter(writeFile);
-    			writer.write(this.highscore);
-    			System.out.println("Saved highscore: " + this.highscore);
-    		}
-    		catch (Exception e)
-    		{
-    			e.printStackTrace();
-    		}
-    		finally
-    		{
-					try {
-						if (writer !=null)
-						writer.close();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-    		}
-    		
-    	}
-    	
     }
 
-    /*public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            // Starte das Spiel
-            new MinesweeperMain().start();
-        });
-    }*/
+    private void handleRightClick(Cell cell) {
+        if (!cell.isEnabled()) {
+            return;
+        }
+        cell.setFlagged(!cell.isFlagged());
+    }
 
     // Methode zum Starten des Spiels und Anzeigen des Startmenüs
     void start() {
@@ -462,26 +393,25 @@ private void initializeScoreLabel() {
         JButton level2Button = new JButton("Level 2");
         JButton level3Button = new JButton("Level 3");
 
-        // ActionListener für die Levelauswahl
+        //Levelauswahl
         ActionListener levelActionListener = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Bestimme das gewählte Level
+
                 int gridSize = 0;
                 if (e.getSource() == level1Button) {
-                    gridSize = 5; // Beispiel: Level 1 hat eine Gittergröße von 5x5
+                    gridSize = 5;
                 } else if (e.getSource() == level2Button) {
-                    gridSize = 8; // Beispiel: Level 2 hat eine Gittergröße von 8x8
+                    gridSize = 10;
                 } else if (e.getSource() == level3Button) {
-                    gridSize = 10; // Beispiel: Level 3 hat eine Gittergröße von 10x10
+                    gridSize = 15;
                 }
 
                 // Starte das Spiel mit dem gewählten Level
-                menuFrame.dispose(); // Schließe das Startmenü
-                new MinesweeperMain(gridSize); // Starte das Spiel mit dem gewählten Level
+                menuFrame.dispose(); // Schließe Startmenü
+                new MinesweeperMain(gridSize); // Startet Spiel mit gewählten Level
             }
         };
-
 
         level1Button.addActionListener(levelActionListener);
         level2Button.addActionListener(levelActionListener);
@@ -493,15 +423,16 @@ private void initializeScoreLabel() {
 
         startMenuPanel.add(levelButtonPanel, BorderLayout.CENTER);
 
-
         menuFrame.add(startMenuPanel, BorderLayout.CENTER);
 
         menuFrame.setLocationRelativeTo(null);
         menuFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         menuFrame.setVisible(true);
     }
+
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             new MinesweeperMain().start();
         });
-    }}
+    }
+}
