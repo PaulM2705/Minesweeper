@@ -4,6 +4,12 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 public class MinesweeperMain {
@@ -15,7 +21,7 @@ public class MinesweeperMain {
 
     private int gridSize = 10; //legt die Größe des Feldes fest
     private int score;
-    private int highscore = 0; // Highscore wird hier gespeichert
+    private String highscore = ""; // Highscore wird hier gespeichert
 
     private Cell[][] cells;
 
@@ -134,8 +140,8 @@ public class MinesweeperMain {
 
         initializeButtonPanel();
         initializeGrid();
-        initializeScore();
         initializeScoreLabel();
+        initializeScore();
 
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -159,6 +165,8 @@ private void initializeScoreLabel() {
 
     private void initializeScore() {
         score = 0;
+        highscore = GetHighScore();
+        updateScoreLabel();
     }
 
     private void updateScoreLabel() {
@@ -173,6 +181,7 @@ private void initializeScoreLabel() {
             score += cell.getValue();
         }
         updateScoreLabel();
+        System.out.println("Current score: " + score);
     }
 
     private void initializeButtonPanel() {
@@ -255,6 +264,7 @@ private void initializeScoreLabel() {
                     frame, "You clicked on a mine.", "Game Over",
                     JOptionPane.ERROR_MESSAGE
             );
+            CheckScore();
             resetAllCells(); // Reset cells
             createMines();
         } else {
@@ -283,7 +293,7 @@ private void initializeScoreLabel() {
                 frame, message, "Game Over",
                 JOptionPane.ERROR_MESSAGE
         );
-
+        CheckScore();
         createMines();
         checkForWinOrLoss();
     }
@@ -327,12 +337,99 @@ private void initializeScoreLabel() {
                     frame, "You have won!", "Congratulations",
                     JOptionPane.INFORMATION_MESSAGE
             );
+            CheckScore(); 
         }
 
-        if (score > highscore) {
-            highscore = score;
-            updateScoreLabel();
+        if (highscore.equals("")) {
+        	
+        	highscore = this.GetHighScore();
         }
+    }
+    
+    public String GetHighScore() {
+    	File scoreFile = new File("highscore.dat");
+        if (!scoreFile.exists()) {
+            try {
+                scoreFile.createNewFile();
+                FileWriter writeFile = new FileWriter(scoreFile);
+                BufferedWriter writer = new BufferedWriter(writeFile);
+                writer.write("0");
+                writer.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return "0";
+        }
+        
+    	FileReader readFile = null;
+    	BufferedReader reader = null;
+    	
+    	try 
+    	{
+    		readFile = new FileReader(scoreFile);
+    		reader = new BufferedReader(readFile);
+    		String highscore = reader.readLine();
+    		System.out.println("Loaded highscore: " + highscore);
+    		return highscore != null ? highscore : "0";
+    	}
+    	
+    	catch (Exception e) 
+    	{
+    		System.out.println("Error loading highscore: " + e.getMessage());
+    		return "0";
+    	}
+    	finally 
+    	{
+    		try {
+    			if (reader !=null)reader.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+    	}
+    }
+    
+    public void CheckScore() {
+    	
+    	if (score > Integer.parseInt(highscore)) 
+    	{
+    		highscore = String.valueOf(score);
+    		JOptionPane.showMessageDialog(null, "Neuer Highscore: " + highscore, "Highscore", JOptionPane.INFORMATION_MESSAGE);
+    		
+    		File scoreFile = new File("highscore.dat");
+    		if (!scoreFile.exists()) {
+    			try {
+					scoreFile.createNewFile();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+    			
+    		}
+    		FileWriter writeFile = null;
+    		BufferedWriter writer = null;
+    		
+    		try 
+    		{
+    			writeFile = new FileWriter(scoreFile);
+    			writer = new BufferedWriter(writeFile);
+    			writer.write(this.highscore);
+    			System.out.println("Saved highscore: " + this.highscore);
+    		}
+    		catch (Exception e)
+    		{
+    			e.printStackTrace();
+    		}
+    		finally
+    		{
+					try {
+						if (writer !=null)
+						writer.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+    		}
+    		
+    	}
+    	
     }
 
     /*public static void main(String[] args) {
