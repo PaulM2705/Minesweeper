@@ -296,7 +296,7 @@ public class MinesweeperMain {
     }
 
     private void handleCell(Cell cell) {
-        if (!cell.isEnabled()) {
+        if (!cell.isEnabled() || cell.isFlagged()) {
             return;
         }
         if (cell.isAMine()) {
@@ -487,30 +487,28 @@ public class MinesweeperMain {
         }
     }
 
-   
-            /*ileWriter writeFile = null;
-            BufferedWriter writer = null;
 
-            try {
-                writeFile = new FileWriter(scoreFile);
-                writer = new BufferedWriter(writeFile);
-                writer.write(this.highscore);
-                System.out.println("Saved highscore: " + this.highscore);
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                try {
-                    if (writer != null)
-                        writer.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+    /*ileWriter writeFile = null;
+    BufferedWriter writer = null;
 
-        }*/
+    try {
+        writeFile = new FileWriter(scoreFile);
+        writer = new BufferedWriter(writeFile);
+        writer.write(this.highscore);
+        System.out.println("Saved highscore: " + this.highscore);
+    } catch (Exception e) {
+        e.printStackTrace();
+    } finally {
+        try {
+            if (writer != null)
+                writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
-
-    // Methode zum Starten des Spiels und Anzeigen des Startmenüs
+}*/
+// Methode zum Starten des Spiels und Anzeigen des Startmenüs
     void start() {
         JFrame menuFrame = new JFrame("Minesweeper Start Menu");
         menuFrame.setSize(SIZE, SIZE);
@@ -525,43 +523,39 @@ public class MinesweeperMain {
         welcomeLabel.setHorizontalAlignment(SwingConstants.CENTER);
         startMenuPanel.add(welcomeLabel, BorderLayout.NORTH);
 
-        // Buttons für die Levelauswahl
-        JPanel levelButtonPanel = new JPanel();
-        levelButtonPanel.setLayout(new GridLayout(3, 1));
+        // Feld zur Auswahl der Grid-Größe
+        JPanel gridSizePanel = new JPanel();
+        gridSizePanel.setLayout(new FlowLayout());
 
-        JButton level1Button = new JButton("Level 1");
-        JButton level2Button = new JButton("Level 2");
-        JButton level3Button = new JButton("Level 3");
+        JLabel gridSizeLabel = new JLabel("Spielfeldgröße: ");
+        JTextField gridSizeField = new JTextField(5);
 
-        //Levelauswahl
-        ActionListener levelActionListener = new ActionListener() {
+        gridSizePanel.add(gridSizeLabel);
+        gridSizePanel.add(gridSizeField);
+
+        startMenuPanel.add(gridSizePanel, BorderLayout.CENTER);
+
+        // Button zum Starten des Spiels
+        JButton startButton = new JButton("Spiel starten");
+        startButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
-                int gridSize = 0;
-                if (e.getSource() == level1Button) {
-                    gridSize = 5;
-                } else if (e.getSource() == level2Button) {
-                    gridSize = 10;
-                } else if (e.getSource() == level3Button) {
-                    gridSize = 15;
+                try {
+                    int gridSize = Integer.parseInt(gridSizeField.getText());
+                    if (gridSize <= 0) {
+                        throw new IllegalArgumentException("Grid-Größe muss größer als 0 sein.");
+                    }
+                    menuFrame.dispose(); // Schließe Startmenü
+                    new MinesweeperMain(gridSize); // Starte das Spiel mit der gewählten Grid-Größe
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(menuFrame, "Bitte geben Sie eine gültige Zahl für die Grid-Größe ein.", "Ungültige Eingabe", JOptionPane.ERROR_MESSAGE);
+                } catch (IllegalArgumentException ex) {
+                    JOptionPane.showMessageDialog(menuFrame, ex.getMessage(), "Ungültige Eingabe", JOptionPane.ERROR_MESSAGE);
                 }
-
-                // Starte das Spiel mit dem gewählten Level
-                menuFrame.dispose(); // Schließe Startmenü
-                new MinesweeperMain(gridSize); // Startet Spiel mit gewählten Level
             }
-        };
+        });
 
-        level1Button.addActionListener(levelActionListener);
-        level2Button.addActionListener(levelActionListener);
-        level3Button.addActionListener(levelActionListener);
-
-        levelButtonPanel.add(level1Button);
-        levelButtonPanel.add(level2Button);
-        levelButtonPanel.add(level3Button);
-
-        startMenuPanel.add(levelButtonPanel, BorderLayout.CENTER);
+        startMenuPanel.add(startButton, BorderLayout.SOUTH);
 
         menuFrame.add(startMenuPanel, BorderLayout.CENTER);
 
@@ -569,6 +563,8 @@ public class MinesweeperMain {
         menuFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         menuFrame.setVisible(true);
     }
+
+
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
