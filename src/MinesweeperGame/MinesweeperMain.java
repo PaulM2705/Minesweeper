@@ -30,6 +30,7 @@ public class MinesweeperMain {
     private JFrame frame;
     private JButton reset;
     private JButton giveUp;
+    private JButton backToMenu;
     private JLabel scoreLabel;
     private JLabel highscoreLabel;
 
@@ -43,6 +44,9 @@ public class MinesweeperMain {
             revealBoardAndDisplay("You gave up.");
             score = 0;
             updateScoreLabel();
+        } else if (source == backToMenu) {
+            frame.dispose();
+            start();
         } else {
             handleCell((Cell) source);
         }
@@ -200,10 +204,10 @@ public class MinesweeperMain {
     }
 
     private void updateScoreLabel() {
-    	if (scoreLabel != null && highscoreLabel != null) {
-        scoreLabel.setText("Score: " + score);
-        highscoreLabel.setText("Highscore: " + highscore);
-    	}
+        if (scoreLabel != null && highscoreLabel != null) {
+            scoreLabel.setText("Score: " + score);
+            highscoreLabel.setText("Highscore: " + highscore);
+        }
     }
 
     private void updateScore(Cell cell) {
@@ -221,12 +225,15 @@ public class MinesweeperMain {
 
         reset = new JButton("Reset");
         giveUp = new JButton("Give Up");
+        backToMenu = new JButton("Back to Menu");
 
         reset.addActionListener(actionListener);
         giveUp.addActionListener(actionListener);
+        backToMenu.addActionListener(actionListener);
 
         buttonPanel.add(reset);
         buttonPanel.add(giveUp);
+        buttonPanel.add(backToMenu);
         frame.add(buttonPanel, BorderLayout.SOUTH);
     }
 
@@ -371,6 +378,8 @@ public class MinesweeperMain {
                     JOptionPane.INFORMATION_MESSAGE
             );
             CheckScore();
+            resetAllCells();
+            createMines();
         }
         if (highscore.equals("")) {
 
@@ -386,20 +395,20 @@ public class MinesweeperMain {
     }
 
     public String GetHighScore() {
-    	String input ="";
-       try {
-    	   File file = new File("highscore.dat");
-    	   if(!file.exists()) {
-    		   file.createNewFile();
-    	   }
-    	   BufferedReader reader = new BufferedReader(new FileReader(file));
-    	   input = reader.readLine();
-    	   reader.close();
-       } catch (Exception e) {
-    	   e.printStackTrace();
-    	   }
-       return input == null ? "" : input;
-       }
+        String input = "";
+        try {
+            File file = new File("highscore.dat");
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            input = reader.readLine();
+            reader.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return input == null ? "" : input;
+    }
         /*if (!scoreFile.exists()) {
             try {
                 scoreFile.createNewFile();
@@ -445,7 +454,7 @@ public class MinesweeperMain {
     }*/
 
     public void CheckScore() {
-    	try {
+        try {
             int currentHighScore = Integer.parseInt(highscore.split(" ")[0]);
             if (score > currentHighScore) {
                 String name = JOptionPane.showInputDialog(
@@ -499,8 +508,6 @@ public class MinesweeperMain {
             }
 
         }*/
-
-    
 
 
     // Methode zum Starten des Spiels und Anzeigen des Startmenüs
