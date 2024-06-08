@@ -195,7 +195,18 @@ public class MinesweeperMain {
 
         frame.add(scorePanel, BorderLayout.NORTH);
     }
-
+    private int calculateExtraPoints() {
+        int extraPoints = 0;
+        for (int row = 0; row < gridSize; row++) {
+            for (int col = 0; col < gridSize; col++) {
+                Cell cell = cells[row][col];
+                if (cell.isFlagged() && cell.isAMine()) {
+                    extraPoints += 5;
+                }
+            }
+        }
+        return extraPoints;
+    }
     private void initializeScore() {
         score = 0;
         highscore = GetHighScore();
@@ -243,11 +254,6 @@ public class MinesweeperMain {
         }
 
         gridPanel.setLayout(new GridLayout(gridSize, gridSize));
-
-        /*GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.weightx = 1 / gridSize;
-        gbc.weighty = 1 / gridSize;*/
 
         for (int row = 0; row < gridSize; row++) {
             for (int col = 0; col < gridSize; col++) {
@@ -373,8 +379,12 @@ public class MinesweeperMain {
             }
         }
         if (won) {
+            int extraPoints = calculateExtraPoints();
+            score += extraPoints;
+            updateScoreLabel();
+
             JOptionPane.showMessageDialog(
-                    frame, "You have won!", "Congratulations",
+                    frame, "You have won! Extra points: " + extraPoints, "Congratulations",
                     JOptionPane.INFORMATION_MESSAGE
             );
             CheckScore();
@@ -382,7 +392,6 @@ public class MinesweeperMain {
             createMines();
         }
         if (highscore.equals("")) {
-
             highscore = this.GetHighScore();
         }
     }
@@ -409,49 +418,7 @@ public class MinesweeperMain {
         }
         return input == null ? "" : input;
     }
-        /*if (!scoreFile.exists()) {
-            try {
-                scoreFile.createNewFile();
-                FileWriter writeFile = new FileWriter(scoreFile);
-                BufferedWriter writer = new BufferedWriter(writeFile);
-                writer.write("0");
-                writer.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return "0";
-        }
-        try (BufferedReader reader = new BufferedReader(new FileReader(scoreFile))) {
-            String highscore = reader.readLine();
-            System.out.println("Loaded highscore: " + highscore);
-            return highscore != null ? highscore : "0";
-        } catch (Exception e) {
-            System.out.println("Error loading highscore: " + e.getMessage());
-            return "Nodody:0";
-        }
-    }*/
 
-
-        /*FileReader readFile = null;
-        BufferedReader reader = null;
-
-        try {
-            readFile = new FileReader(scoreFile);
-            reader = new BufferedReader(readFile);
-            String highscore = reader.readLine();
-            System.out.println("Loaded highscore: " + highscore);
-            return highscore != null ? highscore : "0";
-        } catch (Exception e) {
-            System.out.println("Error loading highscore: " + e.getMessage());
-            return "Nodody:0";
-        } finally {
-            try {
-                if (reader != null) reader.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }*/
 
     public void CheckScore() {
         try {
@@ -487,28 +454,7 @@ public class MinesweeperMain {
         }
     }
 
-
-    /*ileWriter writeFile = null;
-    BufferedWriter writer = null;
-
-    try {
-        writeFile = new FileWriter(scoreFile);
-        writer = new BufferedWriter(writeFile);
-        writer.write(this.highscore);
-        System.out.println("Saved highscore: " + this.highscore);
-    } catch (Exception e) {
-        e.printStackTrace();
-    } finally {
-        try {
-            if (writer != null)
-                writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-}*/
-// Methode zum Starten des Spiels und Anzeigen des Startmenüs
+    // Methode zum Starten des Spiels und Anzeigen des Startmenüs
     void start() {
         JFrame menuFrame = new JFrame("Minesweeper Start Menu");
         menuFrame.setSize(SIZE, SIZE);
