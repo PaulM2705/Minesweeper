@@ -6,10 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class Menu extends JFrame {
-
     public Menu() {
-
-        setTitle("Willkommen bein Minesweeper");
+        setTitle("Minesweeper Menu");
         setSize(400, 200);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -17,7 +15,7 @@ public class Menu extends JFrame {
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
 
-        JLabel welcomeLabel = new JLabel("Willkommen bei Minesweeper", SwingConstants.CENTER);
+        JLabel welcomeLabel = new JLabel("Welcome to Minesweeper!", SwingConstants.CENTER);
         welcomeLabel.setFont(new Font("Arial", Font.BOLD, 20));
 
         JButton startButton = new JButton("Press to Play");
@@ -26,29 +24,15 @@ public class Menu extends JFrame {
         startButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                startGame();
+                new GameBoardMenu();
+                dispose();
             }
         });
 
         panel.add(welcomeLabel, BorderLayout.CENTER);
         panel.add(startButton, BorderLayout.SOUTH);
         add(panel);
-    }
 
-    private void startGame() {
-        dispose();
-
-        MinesweeperMain game = new MinesweeperMain();
-        game.start();
-    }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                Menu menu = new Menu();
-                menu.setVisible(true);
-            }
-        });
+        setVisible(true);
     }
 }
