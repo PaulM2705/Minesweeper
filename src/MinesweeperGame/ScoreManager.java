@@ -53,6 +53,7 @@ public class ScoreManager {
         highscore = GetHighScore();
         updateScoreLabel();
     }
+
     public void addToScore(int points) {
         score += points;
     }
@@ -90,7 +91,7 @@ public class ScoreManager {
         }
         return input == null ? "" : input;
     }
-    
+
     public void resetScore() {
         score = 0;
         updateScoreLabel();

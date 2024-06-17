@@ -41,7 +41,7 @@ public class GameBoard extends JPanel {
                     scoreManager.resetScore();
                 } else if (source == backToMenuButton) {
                     SwingUtilities.getWindowAncestor(GameBoard.this).dispose();
-                    new GameBoardMenu(); 
+                    new GameBoardMenu();
                 } else {
                     handleCell((Cell) source);
                 }
@@ -61,7 +61,7 @@ public class GameBoard extends JPanel {
         buttonPanel.add(giveUpButton);
         buttonPanel.add(backToMenuButton);
 
-        add(buttonPanel, BorderLayout.SOUTH); 
+        add(buttonPanel, BorderLayout.SOUTH);
 
         MouseAdapter mouseAdapter = new MouseAdapter() {
             @Override
@@ -130,7 +130,6 @@ public class GameBoard extends JPanel {
         if (!cell.isEnabled() || cell.isFlagged()) {
             return;
         }
-
         if (cell.isAMine()) {
             cell.setForeground(Color.RED);
             cell.reveal();
@@ -191,7 +190,7 @@ public class GameBoard extends JPanel {
         }
         if (won) {
             int extraPoints = scoreManager.calculateExtraPoints(cells, gridSize);
-            scoreManager.addToScore(extraPoints); 
+            scoreManager.addToScore(extraPoints);
             scoreManager.updateScoreLabel();
 
             JOptionPane.showMessageDialog(
@@ -199,7 +198,7 @@ public class GameBoard extends JPanel {
                     JOptionPane.INFORMATION_MESSAGE
             );
 
-            scoreManager.CheckScore(); 
+            scoreManager.CheckScore();
 
             resetAllCells();
             createMines();

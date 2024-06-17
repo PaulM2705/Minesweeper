@@ -13,7 +13,7 @@ public class Cell extends JButton {
     private boolean flagged;
     private final ActionListener actionListener;
     private final MouseAdapter mouseAdapter;
-    
+
     private static final Cell[] reusableStorage = new Cell[8];
 
     public Cell(int row, int col, ActionListener actionListener, MouseAdapter mouseAdapter) {
@@ -26,8 +26,8 @@ public class Cell extends JButton {
         addMouseListener(mouseAdapter);
         setText("");
     }
-    
-	public int getValue() {
+
+    public int getValue() {
         return value;
     }
 
@@ -41,7 +41,7 @@ public class Cell extends JButton {
 
     public void reset() {
         setValue(0);
-        setEnabled(true); 
+        setEnabled(true);
         setText("");
         setFlagged(false);
     }
@@ -65,21 +65,17 @@ public class Cell extends JButton {
         }
     }
 
-
-
-
-
     public void getNeighbours(Cell[] container, Cell[][] cells, int gridSize) {
-        Arrays.fill(container, null); 
-        
-        int index = 0; 
+        Arrays.fill(container, null);
+
+        int index = 0;
 
         for (int rowOffset = -1; rowOffset <= 1; rowOffset++) {
             for (int colOffset = -1; colOffset <= 1; colOffset++) {
                 if (rowOffset == 0 && colOffset == 0) {
                     continue;
                 }
-                
+
                 int rowValue = row + rowOffset;
                 int colValue = col + colOffset;
 
@@ -89,10 +85,11 @@ public class Cell extends JButton {
             }
         }
     }
+
     public boolean isFlagged() {
         return flagged;
     }
-    
+
     public void toggleFlag() {
         setFlagged(!flagged);
     }
@@ -101,7 +98,7 @@ public class Cell extends JButton {
         this.flagged = flagged;
         setText(flagged ? "\uD83D\uDEA9" : "");
     }
-    
+
     public int getRow() {
         return row;
     }

@@ -12,7 +12,17 @@ public class Menu extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        BackgroundPanel panelBack = new BackgroundPanel("C:\\Users\\piet_\\IdeaProjects\\Minesweeper\\src\\MinesweeperGame\\Minesweeper.jpeg");
+        // Laden des Hintergrundbildes aus dem gleichen Ordner wie die Klassen
+        ImageIcon backgroundImage = new ImageIcon(Menu.class.getResource("Minesweeper.jpeg"));
+
+        // Erstellen des Hintergrund-Panels
+        JPanel panelBack = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                g.drawImage(backgroundImage.getImage(), 0, 0, getWidth(), getHeight(), this);
+            }
+        };
         panelBack.setLayout(new BorderLayout());
 
         JPanel contentPanel = new JPanel();

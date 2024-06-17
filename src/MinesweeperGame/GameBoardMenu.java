@@ -13,12 +13,19 @@ public class GameBoardMenu extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Hintergrundbild hinzufügen
-        BackgroundPanel panelBack = new BackgroundPanel("C:\\Users\\piet_\\IdeaProjects\\Minesweeper\\src\\MinesweeperGame\\Minesweeper.jpeg");
+        ImageIcon backgroundImage = new ImageIcon(GameBoardMenu.class.getResource("Minesweeper.jpeg"));
+
+        JPanel panelBack = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                g.drawImage(backgroundImage.getImage(), 0, 0, getWidth(), getHeight(), this);
+            }
+        };
         panelBack.setLayout(new BorderLayout());
 
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setOpaque(false); // Panel durchsichtig machen
+        panel.setOpaque(false);
 
         JLabel setupLabel = new JLabel("Setup your game board", SwingConstants.CENTER);
         setupLabel.setFont(new Font("Serif", Font.ITALIC, 50));
@@ -67,7 +74,7 @@ public class GameBoardMenu extends JFrame {
 
         panelBack.add(panel, BorderLayout.CENTER);
 
-        getContentPane().add(panelBack); // panelBack zum Hauptframe hinzufügen
+        getContentPane().add(panelBack);
 
         setVisible(true);
     }
