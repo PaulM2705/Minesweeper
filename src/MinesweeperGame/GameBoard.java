@@ -27,6 +27,8 @@ public class GameBoard extends JPanel {
         this.cells = new Cell[gridSize][gridSize];
         setLayout(new BorderLayout());
         initialize();
+
+        setPreferredSize(new Dimension(1000, 800));
     }
 
     private void initialize() {
@@ -47,7 +49,10 @@ public class GameBoard extends JPanel {
         };
 
         giveUpButton = new JButton("Give Up");
+        giveUpButton.setFont(new Font("Serif", Font.ITALIC, 20));
+
         backToMenuButton = new JButton("Back to Menu");
+        backToMenuButton.setFont(new Font("Serif", Font.ITALIC, 20));
 
         giveUpButton.addActionListener(actionListener);
         backToMenuButton.addActionListener(actionListener);

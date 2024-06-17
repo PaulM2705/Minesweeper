@@ -9,21 +9,27 @@ public class GameBoardMenu extends JFrame {
 
     public GameBoardMenu() {
         setTitle("Game Board Setup");
-        setSize(400, 200);
+        setSize(1000, 800);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        JPanel panel = new JPanel();
-        panel.setLayout(new BorderLayout());
+        // Hintergrundbild hinzufügen
+        BackgroundPanel panelBack = new BackgroundPanel("C:\\Users\\piet_\\IdeaProjects\\Minesweeper\\src\\MinesweeperGame\\Minesweeper.jpeg");
+        panelBack.setLayout(new BorderLayout());
+
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setOpaque(false); // Panel durchsichtig machen
 
         JLabel setupLabel = new JLabel("Setup your game board", SwingConstants.CENTER);
-        setupLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        setupLabel.setFont(new Font("Serif", Font.ITALIC, 50));
+        setupLabel.setForeground(Color.BLACK);
 
         JLabel sizeLabel = new JLabel("Grid Size: ");
-        JTextField sizeField = new JTextField(5);
+        sizeLabel.setFont(new Font("Serif", Font.ITALIC, 25));
+        JTextField sizeField = new JTextField(10);
 
         JButton startButton = new JButton("Start Game");
-        startButton.setFont(new Font("Arial", Font.PLAIN, 16));
+        startButton.setFont(new Font("Serif", Font.ITALIC, 30));
 
         startButton.addActionListener(new ActionListener() {
             @Override
@@ -33,14 +39,14 @@ public class GameBoardMenu extends JFrame {
                     if (gridSize <= 0) {
                         throw new IllegalArgumentException("Grid size must be greater than 0.");
                     }
-                    JFrame frame = new JFrame("Minesweeper"); 
+                    JFrame frame = new JFrame("Minesweeper");
                     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                     GameBoard gameBoard = new GameBoard(gridSize, new ScoreManager(frame));
                     frame.getContentPane().add(gameBoard);
                     frame.pack();
                     frame.setLocationRelativeTo(null);
-                    frame.setVisible(true); 
-                    dispose(); 
+                    frame.setVisible(true);
+                    dispose();
                 } catch (NumberFormatException ex) {
                     JOptionPane.showMessageDialog(null, "Please enter a valid number for grid size.", "Invalid Input", JOptionPane.ERROR_MESSAGE);
                 } catch (IllegalArgumentException ex) {
@@ -51,20 +57,18 @@ public class GameBoardMenu extends JFrame {
 
         panel.add(setupLabel, BorderLayout.NORTH);
 
-        JPanel sizePanel = new JPanel();
-        sizePanel.add(sizeLabel);
-        sizePanel.add(sizeField);
+        JPanel inputPanel = new JPanel();
+        inputPanel.setOpaque(false);
+        inputPanel.add(sizeLabel);
+        inputPanel.add(sizeField);
 
-        panel.add(sizePanel, BorderLayout.CENTER);
+        panel.add(inputPanel, BorderLayout.CENTER);
         panel.add(startButton, BorderLayout.SOUTH);
 
-        add(panel);
+        panelBack.add(panel, BorderLayout.CENTER);
+
+        getContentPane().add(panelBack); // panelBack zum Hauptframe hinzufügen
 
         setVisible(true);
-    }
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            new GameBoardMenu();
-        });
     }
 }

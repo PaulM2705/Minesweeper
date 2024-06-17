@@ -24,6 +24,10 @@ public class ScoreManager {
         scoreLabel = new JLabel("Score: " + score);
         highscoreLabel = new JLabel("Highscore: " + highscore);
 
+        Font labelFont = new Font("Serif", Font.ITALIC, 20);
+        scoreLabel.setFont(labelFont);
+        highscoreLabel.setFont(labelFont);
+
         JPanel scorePanel = new JPanel(new BorderLayout());
         scorePanel.add(scoreLabel, BorderLayout.WEST);
         scorePanel.add(highscoreLabel, BorderLayout.EAST);
