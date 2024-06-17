@@ -88,7 +88,7 @@ public class GameBoard extends JPanel {
     public void createMines() {
         resetAllCells();
 
-        final int mineCount = gridSize * gridSize / 20; // Bomben einstellen
+        final int mineCount = gridSize * 2; // Bomben einstellen
         final Random random = new Random();
 
         Set<Integer> minePositions = new HashSet<>();
