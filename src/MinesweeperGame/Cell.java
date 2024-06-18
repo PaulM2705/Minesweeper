@@ -1,8 +1,16 @@
 package MinesweeperGame;
 
 import javax.swing.JButton;
+import javax.swing.UIManager;
+import javax.swing.border.Border;
+import javax.swing.border.LineBorder;
+import java.awt.Color;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
+import java.awt.geom.RoundRectangle2D;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -11,10 +19,16 @@ public class Cell extends JButton {
     private final int col;
     private int value;
     private boolean flagged;
+    private boolean revealed;
     private final ActionListener actionListener;
     private final MouseAdapter mouseAdapter;
 
     private static final Cell[] reusableStorage = new Cell[8];
+
+    private static final Color LIGHT_BLUE = new Color(152, 211, 255);
+    private static final Color DEFAULT_BACKGROUND = UIManager.getColor("Button.background");
+
+    private Color numberColor = Color.BLACK;
 
     public Cell(int row, int col, ActionListener actionListener, MouseAdapter mouseAdapter) {
         this.row = row;
@@ -25,6 +39,27 @@ public class Cell extends JButton {
         addActionListener(actionListener);
         addMouseListener(mouseAdapter);
         setText("");
+        setBackground(LIGHT_BLUE);
+
+        setRoundedBorder();
+    }
+
+    private void setRoundedBorder() {
+        Border roundedBorder = new LineBorder(DEFAULT_BACKGROUND, 1, true) {
+            @Override
+            public void paintBorder(java.awt.Component c, java.awt.Graphics g, int x, int y, int width, int height) {
+                java.awt.Graphics2D g2d = (java.awt.Graphics2D) g.create();
+                g2d.setColor(getLineColor());
+                g2d.draw(new RoundRectangle2D.Double(x, y, width - 1, height - 1, 10, 10));
+                g2d.dispose();
+            }
+
+            @Override
+            public boolean isBorderOpaque() {
+                return true;
+            }
+        };
+        setBorder(roundedBorder);
     }
 
     public int getValue() {
@@ -44,12 +79,48 @@ public class Cell extends JButton {
         setEnabled(true);
         setText("");
         setFlagged(false);
+        setBackground(LIGHT_BLUE);
+        revealed = false; // Zurücksetzen der Aufgedeckt-Flagge beim Zurücksetzen der Zelle
+    }
+
+    private Color NumberColor = Color.BLACK; // Standardfarbe
+
+    public void setNumberColor(int value) {
+        switch (value) {
+            case 1:
+                numberColor = new Color(111, 216, 244);
+                break;
+            case 2:
+                numberColor = new Color(141, 229, 69);
+                break;
+            case 3:
+                numberColor = new Color(253, 119, 149);
+                break;
+            case 4:
+                numberColor = new Color(239, 20, 0);
+                break;
+            case 5:
+                numberColor = new Color(0, 32, 240);
+                break;
+            default:
+                numberColor = Color.BLACK; // Standard Schwarz
+                break;
+        }
+        repaint();
     }
 
     public void reveal() {
         if (!flagged) {
             setEnabled(false);
-            setText(isAMine() ? "\uD83D\uDCA3\u200B" : String.valueOf(value));
+            setBackground(DEFAULT_BACKGROUND);
+            if (isAMine() && !revealed) { // Nur anzeigen, wenn die Bombe nicht bereits aufgedeckt wurde
+                setText("\uD83D\uDCA3\u200B");
+            } else {
+                setText(String.valueOf(value));
+                setNumberColor(value);
+            }
+            setFont(getFont().deriveFont(30f));
+            revealed = true; // Markiere die Zelle als aufgedeckt
         }
     }
 
@@ -80,7 +151,7 @@ public class Cell extends JButton {
                 int colValue = col + colOffset;
 
                 if (rowValue >= 0 && rowValue < gridSize && colValue >= 0 && colValue < gridSize) {
-                    container[index++] = cells[rowValue][colValue]; // Assign the neighbor cell to the container array
+                    container[index++] = cells[rowValue][colValue];
                 }
             }
         }
@@ -97,6 +168,13 @@ public class Cell extends JButton {
     public void setFlagged(boolean flagged) {
         this.flagged = flagged;
         setText(flagged ? "\uD83D\uDEA9" : "");
+
+        if (flagged) {
+            setBackground(new Color(255, 228, 159));
+        } else {
+            setBackground(LIGHT_BLUE);
+        }
+        setFont(getFont().deriveFont(30f));
     }
 
     public int getRow() {
@@ -118,5 +196,41 @@ public class Cell extends JButton {
     @Override
     public int hashCode() {
         return Objects.hash(row, col);
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+
+        Graphics2D g2d = (Graphics2D) g.create();
+
+        if (!getText().isEmpty() && !getText().equals("\uD83D\uDCA3\u200B")) {
+            g2d.setColor(numberColor);
+            g2d.setFont(getFont());
+            FontMetrics fm = g2d.getFontMetrics();
+            int x = (getWidth() - fm.stringWidth(getText())) / 2;
+            int y = (getHeight() - fm.getHeight()) / 2 + fm.getAscent();
+            g2d.drawString(getText(), x, y);
+        }
+
+        if (getText().equals("\uD83D\uDEA9")) {
+            g2d.setColor(Color.BLACK);
+            g2d.setFont(getFont());
+            FontMetrics fm = g2d.getFontMetrics();
+            int x = (getWidth() - fm.stringWidth(getText())) / 2;
+            int y = (getHeight() - fm.getHeight()) / 2 + fm.getAscent();
+            g2d.drawString(getText(), x, y);
+        }
+
+        if (isAMine() && revealed) {
+            g2d.setColor(Color.BLACK);
+            g2d.setFont(getFont());
+            FontMetrics fm = g2d.getFontMetrics();
+            int x = (getWidth() - fm.stringWidth("\uD83D\uDCA3\u200B")) / 2;
+            int y = (getHeight() - fm.getHeight()) / 2 + fm.getAscent();
+            g2d.drawString("\uD83D\uDCA3\u200B", x, y); // Zeichnet die Bombe in Schwarz
+        }
+
+        g2d.dispose();
     }
 }

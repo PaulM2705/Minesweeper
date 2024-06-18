@@ -211,5 +211,10 @@ public class GameBoard extends JPanel {
                 cells[row][col].reset();
             }
         }
+    }  @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        Image backgroundImage = new ImageIcon(getClass().getResource("Minesweeper.jpeg")).getImage();
+        g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
     }
 }
