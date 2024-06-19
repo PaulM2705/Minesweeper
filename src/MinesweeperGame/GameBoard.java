@@ -198,7 +198,7 @@ public class GameBoard extends JPanel {
 					JOptionPane.INFORMATION_MESSAGE
 					);
 
-			scoreManager.checkScore();
+			scoreManager.checkScore();//Alles entfernt
 
 			resetAllCells();
 			createMines();
