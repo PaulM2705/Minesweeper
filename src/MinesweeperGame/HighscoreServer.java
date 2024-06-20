@@ -45,8 +45,6 @@ public class HighscoreServer {
     }
 
 
-
-
     private void saveHighscoreData(String highscoreData) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("highscores", true))) {
             writer.write(highscoreData);

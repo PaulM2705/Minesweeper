@@ -149,7 +149,7 @@ public class ScoreManager {
 
         } catch (IOException e) {
             e.printStackTrace();
-            System.err.println("Error sending highscores to server: " + e.getMessage());//Test
+            System.err.println("Error sending highscores to server: " + e.getMessage());
         }
     }
 
@@ -166,6 +166,6 @@ public class ScoreManager {
         if (sb.length() > 0) {
             sb.setLength(sb.length() - delimiter.length());
         }
-        return sb.toString().trim();//Test
+        return sb.toString().trim();
     }
 }

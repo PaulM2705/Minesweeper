@@ -25,7 +25,7 @@ public class Cell extends JButton {
 
     private static final Cell[] reusableStorage = new Cell[8];
 
-    private static final Color LIGHT_BLUE = new Color(152, 211, 255);
+    private static final Color LIGHT_BLUE = new Color(80, 187, 255);
     private static final Color DEFAULT_BACKGROUND = UIManager.getColor("Button.background");
 
     private Color numberColor = Color.BLACK;
@@ -80,10 +80,10 @@ public class Cell extends JButton {
         setText("");
         setFlagged(false);
         setBackground(LIGHT_BLUE);
-        revealed = false; // Zurücksetzen der Aufgedeckt-Flagge beim Zurücksetzen der Zelle
+        revealed = false;
     }
 
-    private Color NumberColor = Color.BLACK; // Standardfarbe
+    private Color NumberColor = Color.BLACK;
 
     public void setNumberColor(int value) {
         switch (value) {
@@ -113,14 +113,14 @@ public class Cell extends JButton {
         if (!flagged) {
             setEnabled(false);
             setBackground(DEFAULT_BACKGROUND);
-            if (isAMine() && !revealed) { // Nur anzeigen, wenn die Bombe nicht bereits aufgedeckt wurde
+            if (isAMine() && !revealed) {
                 setText("\uD83D\uDCA3\u200B");
             } else {
                 setText(String.valueOf(value));
                 setNumberColor(value);
             }
-            setFont(getFont().deriveFont(30f));
-            revealed = true; // Markiere die Zelle als aufgedeckt
+            setFont(getFont().deriveFont(20f));
+            revealed = true;
         }
     }
 
@@ -228,7 +228,7 @@ public class Cell extends JButton {
             FontMetrics fm = g2d.getFontMetrics();
             int x = (getWidth() - fm.stringWidth("\uD83D\uDCA3\u200B")) / 2;
             int y = (getHeight() - fm.getHeight()) / 2 + fm.getAscent();
-            g2d.drawString("\uD83D\uDCA3\u200B", x, y); // Zeichnet die Bombe in Schwarz
+            g2d.drawString("\uD83D\uDCA3\u200B", x, y);
         }
 
         g2d.dispose();

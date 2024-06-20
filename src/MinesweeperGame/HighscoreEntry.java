@@ -19,7 +19,7 @@ public class HighscoreEntry implements Comparable<HighscoreEntry> {
 
     @Override
     public int compareTo(HighscoreEntry other) {
-        return Integer.compare(other.score, this.score); 
+        return Integer.compare(other.score, this.score);
     }
 
     @Override
